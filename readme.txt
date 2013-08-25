@@ -38,7 +38,7 @@ After importing, all videos can be embedded into posts using a visual interface 
 * Automatic bulk import (**PRO version only**);
 * Image import in WordPress Media gallery as post Featured Image (**PRO version only**);
 * Video playlist for latest videos widget (**PRO version only**);
-* WordPress third party theme support (**PRO version only**; currently available only for themes [deTube](http://themeforest.net/item/detube-professional-video-wordpress-theme/2664497), [Avada](http://themeforest.net/item/avada-responsive-multipurpose-theme/2833226)), [SimpleMag](http://themeforest.net/item/simplemag-magazine-theme-for-creative-stuff/4923427) and [GoodWork](http://themeforest.net/item/goodwork-modern-responsive-multipurpose-wordpress-theme/4574698));
+* WordPress third party theme support (**PRO version only**; currently available only for themes [deTube](http://themeforest.net/item/detube-professional-video-wordpress-theme/2664497), [Avada](http://themeforest.net/item/avada-responsive-multipurpose-theme/2833226), [SimpleMag](http://themeforest.net/item/simplemag-magazine-theme-for-creative-stuff/4923427) and [GoodWork](http://themeforest.net/item/goodwork-modern-responsive-multipurpose-wordpress-theme/4574698));
 * Single video shortcode customization (**PRO version only**);
 * Priority support (**PRO version only**).
 
