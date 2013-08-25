@@ -2,7 +2,7 @@
 Contributors: constantin.boiangiu
 Tags: auto hd, autohd, basic analytics, embed videos, embed vimeo, embedding vimeo, HD, plugin, seo, shortcode, simple, simple vimeo, smart vimeo playback, video, video analytics, video plugin, video shortcode, web videos, wordpress vimeo embed, vimeo, vimeo embed, vimeo embedding, vimeo player, vimeo plugin, vimeo shortcode, video, HTML5 video player, video playlist, vimeo video playlist
 Requires at least: 3.5
-Tested up to: 3.5.2
+Tested up to: 3.6
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
