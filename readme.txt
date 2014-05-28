@@ -1,13 +1,13 @@
-=== CodeFlavors Vimeo Video Post ===
+=== WordPress Vimeo video import ===
 Contributors: constantin.boiangiu
-Tags: auto hd, autohd, basic analytics, embed videos, embed vimeo, embedding vimeo, HD, plugin, seo, shortcode, simple, simple vimeo, smart vimeo playback, video, video analytics, video plugin, video shortcode, web videos, wordpress vimeo embed, vimeo, vimeo embed, vimeo embedding, vimeo player, vimeo plugin, vimeo shortcode, video, HTML5 video player, video playlist, vimeo video playlist
+Tags: auto hd, autohd, embed videos, embed vimeo, embedding vimeo, HD, plugin, seo, shortcode, simple, simple vimeo, smart vimeo playback, video, video plugin, video shortcode, web videos, wordpress vimeo embed, vimeo, vimeo embed, vimeo embedding, vimeo player, vimeo plugin, vimeo shortcode, video, HTML5 video player, video playlist, vimeo video playlist
 Requires at least: 3.5
-Tested up to: 3.6
+Tested up to: 3.9.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-The easiest way to import any Vimeo video into WordPress.
+Create WordPress posts from Vimeo videos complete with video embed, title, description and featured image. 
 
 == Description ==
 
@@ -36,9 +36,11 @@ After importing, all videos can be embedded into posts using a visual interface 
 * Manual bulk import;
 * Playlist themes;
 * Automatic bulk import (**PRO version only**);
+* Import private videos (**PRO version only**);
 * Image import in WordPress Media gallery as post Featured Image (**PRO version only**);
 * Video playlist for latest videos widget (**PRO version only**);
 * WordPress third party theme support (**PRO version only**; currently available only for themes [deTube](http://themeforest.net/item/detube-professional-video-wordpress-theme/2664497), [Avada](http://themeforest.net/item/avada-responsive-multipurpose-theme/2833226), [SimpleMag](http://themeforest.net/item/simplemag-magazine-theme-for-creative-stuff/4923427) and [GoodWork](http://themeforest.net/item/goodwork-modern-responsive-multipurpose-wordpress-theme/4574698));
+* Import videos as regular post type (**PRO version only**);
 * Single video shortcode customization (**PRO version only**);
 * Priority support (**PRO version only**).
 
