@@ -45,6 +45,10 @@ class CVM_Video_Post_Type{
 		
 		// help screens
 		add_filter('contextual_help', array( $this, 'contextual_help' ), 10, 3);
+		
+		// add a filter to detect if PRO version is installed and remove its activation link and add a message
+		add_filter('plugin_row_meta', array( $this, 'plugin_meta' ), 10, 2);
+		add_filter('plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2);
 	}
 	
 	/**
@@ -218,6 +222,42 @@ class CVM_Video_Post_Type{
 		foreach( $help_screens as $help_screen ){		
 			$screen->add_help_tab($help_screen);		
 		}
+	}
+	
+	/**
+	 * Add meta description to plugin row in plugins page
+	 * @param array $meta
+	 * @param string $file
+	 */
+	public function plugin_meta( $meta, $file ){
+		// check if Lite is installed and disable activate link
+		$pro_file = 'vimeo-video-post/main.php';
+		
+		if( $file == $pro_file ){
+			$meta[] = '<span class="file-error">' . __('To activate Vimeo Video Post you must first deactivate <strong>CodeFlavors Vimeo Video Post Lite</strong>.', 'cvm_video') . '</span>';			
+		}
+		return $meta;
+	}
+	
+	/**
+	 * Add extra actions links to plugin row in plugins page
+	 * @param array $links
+	 * @param string $file
+	 */
+	public function plugin_action_links( $links, $file ){
+		// add Settings link to plugin actions
+		$plugin_file = plugin_basename( CVM_PATH . '/main.php' );
+		if( $file == $plugin_file ){
+			$links[] = sprintf( '<a href="%s">%s</a>', menu_page_url( 'cvm_settings' , false), __('Settings', 'cvm_video') );
+		}
+		
+		// check if Lite is installed and disable activate link
+		$pro_file = 'vimeo-video-post/main.php';
+		if( $file == $pro_file ){
+			unset( $links['activate'] );
+		}
+
+		return $links;
 	}
 	
 	/**
