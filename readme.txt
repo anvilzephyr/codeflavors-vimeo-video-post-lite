@@ -1,5 +1,5 @@
 === WordPress Vimeo video import ===
-Contributors: constantin.boiangiu
+Contributors: codeflavors
 Tags: auto hd, autohd, embed videos, embed vimeo, embedding vimeo, HD, plugin, seo, shortcode, simple, simple vimeo, smart vimeo playback, video, video plugin, video shortcode, web videos, wordpress vimeo embed, vimeo, vimeo embed, vimeo embedding, vimeo player, vimeo plugin, vimeo shortcode, video, HTML5 video player, video playlist, vimeo video playlist
 Requires at least: 3.5
 Tested up to: 3.9.1
