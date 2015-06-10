@@ -13,7 +13,7 @@
 			<tr class="cvm_feed">
 				<th valign="top" scope="row">
 		<?php endif;?>
-					<label for="cvm_feed"><?php _e('Feed type', 'cvm_video');?> :</label>
+					<label for="cvm_feed"><?php _e('Feed type', 'cvm_video');?>:</label>
 		<?php if( !isset( $metabox ) ):?>
 				</th>
 				<td>
@@ -79,7 +79,7 @@
 			<span class="cvm_order">
 			<?php endif;?>
 				
-					<label for="cvm_order"><?php _e('Order by', 'cvm_video');?> :</label>
+					<label for="cvm_order"><?php _e('Order by', 'cvm_video');?>:</label>
 			<?php if( !isset( $metabox ) ):?>		
 					</th>
 				<td>

@@ -57,6 +57,11 @@ function cvm_is_video_post(){
 	return true;
 }
 
+function cvm_get_post_type(){
+	global $CVM_POST_TYPE;
+	return $CVM_POST_TYPE->get_post_type();
+}
+
 /**
  * Adds video player script to page
  */
@@ -145,7 +150,8 @@ function cvm_plugin_settings_defaults(){
 		'import_description' 	=> 'post_content', // import descriptions on custom posts
 		'import_status'			=> 'draft', // default import status of videos
 		'vimeo_consumer_key'	=> '',
-		'vimeo_secret_key'		=> ''	
+		'vimeo_secret_key'		=> '',
+		'oauth_token'			=> '',// retrieved from Vimeo
 	);
 	return $defaults;
 }
@@ -186,6 +192,17 @@ function cvm_update_settings(){
 		if( isset( $_POST[ $key ] ) ){
 			$defaults[ $key ] = $_POST[ $key ];
 		}
+	}
+	// current settings
+	$plugin_settings = cvm_get_settings();
+	// reset oauth if user changes the keys
+	if( isset( $_POST['vimeo_consumer_key'] ) && isset( $_POST['vimeo_secret_key'] ) ){
+		if( 
+			($_POST['vimeo_consumer_key'] != $plugin_settings['vimeo_consumer_key']) || 
+			($_POST['vimeo_secret_key'] != $plugin_settings['vimeo_secret_key'] ) 
+		){
+			$defaults['oauth_token'] = '';
+		}		
 	}
 	
 	update_option('_cvm_plugin_settings', $defaults);
@@ -882,15 +899,26 @@ function cvm_video_embed( $video_id ){
  * @param string $before
  * @param string $after
  */
-function cvm_import_errors( $echo = true, $before = '<div class="error"><p>', $after = '</p></div>' ){
-	global $CVM_IMPORT_ERR;
-	if( !is_wp_error( $CVM_IMPORT_ERR ) ){
+function cvm_import_errors( $error, $echo = true, $before = '<div class="error"><p>', $after = '</p></div>' ){
+	if( !is_wp_error( $error ) ){
 		return;
 	}
 	
+	// wp error message
+	$code = 'cvm_wp_error';
+	$message = $error->get_error_message( $code );
+	if( $message ){		
+		$output = __('WordPress encountered and error while trying to query Vimeo:', 'cvm_video'). '<br />' . '<strong>'.$message.'</strong></p>';		
+		if( $echo ){
+			echo $before.$output.$after;
+		}		
+		return $before.$output.$after;
+	}
+	
+	// vimeo api errors
 	$code = 'cvm_vimeo_query_error';	
-	$message 	= $CVM_IMPORT_ERR->get_error_message( $code );
-	$data		= $CVM_IMPORT_ERR->get_error_data( $code );
+	$message 	= $error->get_error_message( $code );
+	$data		= $error->get_error_data( $code );
 	
 	$output = '<strong>'.$message.'</strong></p>';
 	$output.= sprintf( __('Vimeo error code: %s (<em>%s</em>) - <strong>%s</strong>', 'cvm_video'), $data['code'], $data['msg'], $data['expl'] );
@@ -931,3 +959,14 @@ function cvm_admin_messages(){
 	}
 }
 add_action('all_admin_notices', 'cvm_admin_messages');
+
+function cvm_docs_link( $path ){
+	$base = 'http://www.codeflavors.com/documentation/vimeo-video-post-wp-plugin/';
+	$vars = array(
+		'utm_source' => 'plugin',
+		'utm_medium' => 'doc_link',
+		'utm_campaign' => 'vimeo-lite-plugin'
+	);
+	$q = http_build_query( $vars );
+	return $base . trailingslashit( $path ) . '?' . $q;
+}

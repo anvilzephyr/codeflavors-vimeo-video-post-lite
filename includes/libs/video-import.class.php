@@ -9,6 +9,7 @@ class CVM_Video_Import extends CVM_Vimeo{
 	private $results;
 	private $total_items;
 	private $page;
+	private $errors;
 	
 	public function __construct( $args ){
 		
@@ -38,38 +39,127 @@ class CVM_Video_Import extends CVM_Vimeo{
 			'sort' 		=> $data['order']
 		);
 		parent::__construct( $request_args );
-		$request_url = parent::request_url();
-		
-		$content = wp_remote_get( $request_url );
+		$content = parent::request_feed();
 		
 		if( is_wp_error( $content ) || 200 != $content['response']['code'] ){
-			// error - bail out
+			if( is_wp_error( $content ) ){
+				$this->errors = new WP_Error();
+				$this->errors->add( 'cvm_wp_error', $content->get_error_message(), $content->get_error_data() );
+			}			
 			return false;
 		}
 		
 		$result = json_decode( $content['body'], true );
 		
-		if( isset( $result['err'] ) ){
-			global $CVM_IMPORT_ERR;
-			$CVM_IMPORT_ERR = new WP_Error();
-			$CVM_IMPORT_ERR->add('cvm_vimeo_query_error', __('Query to Vimeo failed.', 'cvm_video'), $result['err']);
+		// set up Vimeo query errors if any
+		if( isset( $result['error'] ) ){
+			$this->errors = new WP_Error();
+			$this->errors->add( 'cvm_vimeo_query_error', __('Query to Vimeo failed.', 'cvm_video'), $result['error_description']);
 		}
 		
-		if( isset( $result['videos']['video'] ) ){
-			$raw_entries = $result['videos']['video'];
+		/* single video entry */
+		if( 'video' == $request_args['feed'] ){
+			if( isset( $result['uri'] ) ){
+				$this->results = $this->format_video_entry( $result );
+			}else{
+				$this->results = array();
+			}
+			return;
+		}
+		
+		// processign multi videos playlists
+		if( isset( $result['data'] ) ){
+			$raw_entries = $result['data'];
 		}else{
 			$raw_entries = array();
 		}	
 		
 		$entries =	array();
-		
-		foreach ( $raw_entries as $entry ){	
-			$entries[] = cvm_format_video_entry( $entry );					
+		foreach ( $raw_entries as $entry ){			
+			$entries[] = $this->format_video_entry( $entry );		
 		}		
 		
 		$this->results = $entries;
-		$this->total_items = isset( $result['videos']['total'] ) ? $result['videos']['total'] : 0;
-		$this->page = isset( $result['videos']['page'] ) ? $result['videos']['page'] : 0;
+		$this->total_items = isset( $result['total'] ) ? $result['total'] : 0;
+		$this->page = isset( $result['page'] ) ? $result['page'] : 0;
+	}
+	
+/**
+	 * Formats the response from the feed for a single entry
+	 * @param array $entry
+	 */
+	private function format_video_entry( $raw_entry ){
+		$thumbnails = array();
+		if( isset( $raw_entry['pictures']['sizes'] ) ){	
+			foreach( $raw_entry['pictures']['sizes'] as $thumbnail ){
+				$thumbnails[] = $thumbnail['link'];
+			}
+		}
+	
+		$stats = array(
+			'comments' 	=> 0,
+			'likes' 	=> 0,
+			'views' 	=> 0
+		);
+		
+		if( isset( $raw_entry['metadata']['connections']['comments']['total'] ) ){
+			$stats['comments'] = $raw_entry['metadata']['connections']['comments']['total'];
+		}
+		
+		if( isset( $raw_entry['metadata']['connections']['likes']['total'] ) ){
+			$stats['likes'] = $raw_entry['metadata']['connections']['likes']['total'];
+		}
+		
+		if( isset( $raw_entry['stats']['plays'] ) ){
+			$stats['views'] = $raw_entry['stats']['plays'];
+		}
+		
+		// extract tags
+		$tags = array();
+		if( isset( $raw_entry['tags'] ) && is_array( $raw_entry['tags'] ) ){
+			foreach( $raw_entry['tags'] as $tag ){
+				$tags[] = $tag['name'];
+			}		
+		}
+		
+		$privacy = false;
+		if( isset($raw_entry['privacy']) ){
+			if( 'anybody' == $raw_entry['privacy']['view'] ){
+				$privacy = 'public';
+			}else{
+				$privacy = 'private';
+			}
+		}
+		
+		$size = array();
+		if( isset( $raw_entry['width'] ) && isset( $raw_entry['height'] ) ){
+			$w = absint( $raw_entry['width'] );
+			$h = absint( $raw_entry['height'] );
+			$size = array(
+				'width' => $w,
+				'height' => $h,
+				'ratio' => round(  $w/$h  , 2 )
+			);		
+		}
+		
+		$entry = array(
+			'video_id'		=> str_replace( '/videos/' , '', $raw_entry['uri'] ),
+			'uploader'		=> $raw_entry['user']['name'],
+			'uploader_uri'	=> $raw_entry['user']['uri'],
+			'published' 	=> $raw_entry['created_time'],
+			'updated'		=> isset( $raw_entry['modified_time'] ) ? $raw_entry['modified_time'] : false,
+			'title'			=> $raw_entry['name'],
+			'description' 	=> $raw_entry['description'],
+			'category'		=> false,
+			'tags'			=> $tags,
+			'duration'		=> $raw_entry['duration'],
+			'thumbnails'	=> $thumbnails,				
+			'stats'			=> $stats,
+			'privacy'		=> $privacy,
+			'size'			=> $size		
+		);
+		
+		return $entry;
 	}
 	
 	public function get_feed(){
@@ -82,5 +172,9 @@ class CVM_Video_Import extends CVM_Vimeo{
 
 	public function get_page(){
 		return $this->page;
+	}
+	
+	public function get_errors(){
+		return $this->errors;
 	}
 }

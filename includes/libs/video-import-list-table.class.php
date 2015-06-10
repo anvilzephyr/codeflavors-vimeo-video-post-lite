@@ -1,6 +1,8 @@
 <?php
 class CVM_Video_Import_List_Table extends WP_List_Table{
 	
+	private $query_errors;
+		
 	function __construct( $args = array() ){
 		parent::__construct( array(
 			'singular' => 'vimeo-video',
@@ -108,6 +110,12 @@ class CVM_Video_Import_List_Table extends WP_List_Table{
     	return $actions;
     }
 	
+    function no_items(){
+    	if( is_wp_error( $this->query_errors ) ){
+    		echo __( 'Query to Vimeo returned this error: ', 'cvm_video' ) . $this->query_errors->get_error_message();
+    	}
+    }
+    
 	/**
      * Returns the columns of the table as specified
      */
@@ -151,6 +159,8 @@ class CVM_Video_Import_List_Table extends WP_List_Table{
 		$import = new CVM_Video_Import($args);
 		$videos = $import->get_feed();
         
+		$this->query_errors = $import->get_errors();
+		
 		$total_items = $import->get_total_items();
 		
     	$this->items 	= $videos;
@@ -161,4 +171,7 @@ class CVM_Video_Import_List_Table extends WP_List_Table{
         ) );
     }   
     
+    public function get_errors(){
+    	return $this->query_errors;
+    }
 }

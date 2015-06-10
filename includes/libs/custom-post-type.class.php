@@ -410,6 +410,7 @@ class CVM_Video_Post_Type{
 	public function import_page(){
 		
 		global $CVM_List_Table;
+		global $CVM_IMPORT_ERR;
 		?>
 <div class="wrap">
 	<div class="icon32 icon32-posts-video" id="icon-edit"><br></div>
@@ -426,7 +427,7 @@ class CVM_Video_Post_Type{
 			add_meta_box('cvm-import-feed-entries', __('Import', 'cvm_video'), array($this, 'import_entries_meta'), $page_hook, 'side');
 			add_meta_box('cvm-import-new-category-metabox', 	__('Categories', 'cvm_video'), array($this, 'import_categories_meta'), $page_hook, 'side');
 		?>
-		<?php cvm_import_errors();?>	
+		<?php cvm_import_errors( $CVM_List_Table->get_errors() );?>	
 		<div id="poststuff" class="metabox-holder has-right-sidebar">
         	<?php 
         		$metabox = true;
@@ -459,14 +460,14 @@ class CVM_Video_Post_Type{
 	public function import_entries_meta(){
 		$options = cvm_get_settings();		
 		?>
-		<label for="import_description"><?php _e('Set description as', 'cvm_video')?> :</label>
+		<label for="import_description"><?php _e('Set description as', 'cvm_video')?>:</label>
 		<?php 
 			$args = array(
 				'options' => array(
 					'content' 			=> __('content', 'cvm_video'),
 					'excerpt' 			=> __('excerpt', 'cvm_video'),
-					'content_excerpt' 	=> __('content & excerpt', 'cvm_video'),
-					'none'				=> __('do not import', 'cvm_video')
+					'content_excerpt' 	=> __('both', 'cvm_video'),
+					'none'				=> __('none', 'cvm_video')
 				),
 				'name' => 'import_description',
 				'selected' => $options['import_description']								
@@ -474,7 +475,7 @@ class CVM_Video_Post_Type{
 			cvm_select($args);
 		?><br />
 
-		<label for="import_status"><?php _e('Import status', 'cvm_video')?> :</label>
+		<label for="import_status"><?php _e('Import status', 'cvm_video')?>:</label>
 		<?php 
 			$args = array(
 				'options' => array(
@@ -488,7 +489,7 @@ class CVM_Video_Post_Type{
 			cvm_select($args);
 		?><br />
 		
-		<label for="import_title"><?php _e('Import titles', 'cvm_video')?> :</label>
+		<label for="import_title"><?php _e('Import titles', 'cvm_video')?>:</label>
 		<input type="checkbox" value="1" id="import_title" name="import_title"<?php cvm_check($options['import_title']);?> />
 		
 		<?php
@@ -803,6 +804,24 @@ class CVM_Video_Post_Type{
 	public function plugin_settings(){
 		$options 	= cvm_get_settings();
 		$player_opt = cvm_get_player_settings();
+		
+		// fire up Vimeo class
+		require_once CVM_PATH.'includes/libs/vimeo.class.php';
+		$vimeo = new CVM_Vimeo();
+		
+		if( !empty( $options['vimeo_consumer_key'] ) && !empty( $options['vimeo_secret_key'] ) ){
+			if( empty( $options['oauth_token'] ) ){
+				// account token
+				$token = $vimeo->get_unauth_token();
+				if( !is_wp_error( $token ) ){
+					$options['oauth_token'] 	= $token;
+					update_option( '_cvm_plugin_settings', $options );
+				}else{
+					$authorize_error = $token->get_error_message();
+				}
+			}					
+		}
+		
 		include CVM_PATH.'views/plugin_settings.php';
 	}
 	
@@ -815,7 +834,21 @@ class CVM_Video_Post_Type{
 				cvm_update_settings();
 				cvm_update_player_settings();		
 			}
+			wp_redirect( 'edit.php?post_type='.$this->post_type.'&page=cvm_settings', false );
+			die();
 		}
+		
+		wp_enqueue_style(
+			'cvm-plugin-settings',
+			CVM_URL.'assets/back-end/css/plugin-settings.css',
+			false
+		);
+		
+		wp_enqueue_script(
+			'cvm-tabs',
+			CVM_URL.'assets/back-end/js/tabs.js',
+			array('jquery', 'jquery-ui-tabs')
+		);
 		
 		wp_enqueue_script(
 			'cvm-video-edit',
@@ -935,9 +968,9 @@ class CVM_Video_Post_Type{
 <table class="form-table cvm-player-settings-options">
 	<tbody>
 		<tr>
-			<th><label for="cvm_aspect_ratio"><?php _e('Player size', 'cvm_video');?></label></th>
+			<th><label for="cvm_aspect_ratio"><?php _e('Player size', 'cvm_video');?>:</label></th>
 			<td>
-				<label for="cvm_aspect_ratio"><?php _e('Aspect ratio');?> :</label>
+				<label for="cvm_aspect_ratio"><?php _e('Aspect ratio');?>:</label>
 				<?php 
 					$args = array(
 						'options' 	=> array(
@@ -958,7 +991,7 @@ class CVM_Video_Post_Type{
 		</tr>
 				
 		<tr>
-			<th><label for="cvm_video_position"><?php _e('Display video in custom post','cvm_video');?> :</label></th>
+			<th><label for="cvm_video_position"><?php _e('Video position','cvm_video');?>:</label></th>
 			<td>
 				<?php 
 					$args = array(
@@ -975,14 +1008,14 @@ class CVM_Video_Post_Type{
 			</td>
 		</tr>
 		<tr>
-			<th><label for="cvm_volume"><?php _e('Volume', 'cvm_video');?></label> :</th>
+			<th><label for="cvm_volume"><?php _e('Volume', 'cvm_video');?>:</label></th>
 			<td>
 				<input type="text" name="volume" id="cvm_volume" value="<?php echo $settings['volume'];?>" size="1" maxlength="3" />
 				<label for="cvm_volume"><span class="description">( <?php _e('number between 0 (mute) and 100 (max)', 'cvm_video');?> )</span></label>
 			</td>
 		</tr>
 		<tr>
-			<th><label for="cvm_autoplay"><?php _e('Autoplay', 'cvm_video');?></label> :</th>
+			<th><label for="cvm_autoplay"><?php _e('Autoplay', 'cvm_video');?>:</label></th>
 			<td>
 				<input name="autoplay" id="cvm_autoplay" type="checkbox" value="1"<?php cvm_check((bool)$settings['autoplay']);?> />
 				<label for="cvm_autoplay"><span class="description">( <?php _e('when checked, video will start playing once page is loaded', 'cvm_video');?> )</span></label>
@@ -990,7 +1023,7 @@ class CVM_Video_Post_Type{
 		</tr>
 		
 		<tr>
-			<th><label for="title"><?php _e('Show video title', 'cvm_video');?></label> :</th>
+			<th><label for="title"><?php _e('Show video title', 'cvm_video');?>:</label></th>
 			<td>
 				<input name="title" id="cvm_title" class="cvm_title" type="checkbox" value="1"<?php cvm_check((bool)$settings['title']);?> />
 				<label for="cvm_title"><span class="description">( <?php _e('when checked, player will display video title', 'cvm_video');?> )</span></label>
@@ -998,19 +1031,19 @@ class CVM_Video_Post_Type{
 		</tr>
 		
 		<tr>
-			<th><label for="cvm_fullscreen"><?php _e('Allow full screen', 'cvm_video');?></label> :</th>
+			<th><label for="cvm_fullscreen"><?php _e('Allow full screen', 'cvm_video');?>:</label></th>
 			<td>
 				<input name="fullscreen" id="cvm_fullscreen" type="checkbox" value="1"<?php cvm_check((bool)$settings['fullscreen']);?> />
 			</td>
 		</tr>
 		
 		<tr>
-			<th><label for="cvm_color"><?php _e('Player color', 'cvm_video');?></label> :</th>
+			<th><label for="cvm_color"><?php _e('Player color', 'cvm_video');?>:</label></th>
 			<td>#<input type="text" name="color" id="cvm_color" value="<?php echo $settings['color'];?>" /></td>
 		</tr>
 		
 		<tr valign="top">
-			<th scope="row"><label for="byline"><?php _e('Show video author', 'cvm_video')?></label></th>
+			<th scope="row"><label for="byline"><?php _e('Show video author', 'cvm_video')?>:</label></th>
 			<td>
 				<input type="checkbox" value="1" id="byline" name="byline"<?php cvm_check( (bool)$settings['byline'] );?> />
 				<span class="description"><?php _e('When checked, player will display video uploader.', 'cvm_video');?></span>
@@ -1018,7 +1051,7 @@ class CVM_Video_Post_Type{
 		</tr>
 		
 		<tr valign="top">
-			<th scope="row"><label for="portrait"><?php _e('Author portrait', 'cvm_video')?></label></th>
+			<th scope="row"><label for="portrait"><?php _e('Author portrait', 'cvm_video')?>:</label></th>
 			<td>
 				<input type="checkbox" value="1" id="portrait" name="portrait"<?php cvm_check( (bool)$settings['portrait'] );?> />
 				<span class="description"><?php _e('When checked, player will display uploader image.', 'cvm_video');?></span>
