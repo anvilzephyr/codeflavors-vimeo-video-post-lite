@@ -1,8 +1,8 @@
 === WordPress Vimeo videos ===
 Contributors: codeflavors
 Tags: auto hd, autohd, embed videos, embed vimeo, embedding vimeo, HD, plugin, seo, shortcode, simple, simple vimeo, smart vimeo playback, video, video plugin, video shortcode, web videos, wordpress vimeo embed, vimeo, vimeo embed, vimeo embedding, vimeo player, vimeo plugin, vimeo shortcode, video, HTML5 video player, video playlist, vimeo video playlist
-Requires at least: 3.5
-Tested up to: 4.2.2
+Requires at least: 4.0
+Tested up to: 4.3
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -58,6 +58,8 @@ Once activated a new menu entry will be created called **Videos** (look for the 
 In order to be able to perform bulk imports, you will first need to register the plugin as an app on Vimeo website. Registration can be made [here](https://developer.vimeo.com/apps/new "register Vimeo app"). Please note that you must have a Vimeo account before you can register the app.
 After successfull registration, go to plugin page **Settings** and under **Vimeo authentication** enter your consumer and secret key provided by Vimeo. Now you can make bulk imports.
 
+For a detailed tutorial on how to set up Vimeo access registration, please see [this tutorial](http://www.codeflavors.com/documentation/vimeo-video-post-wp-plugin/plugin-settings/vimeo-oauth/ "How to set up Vimeo OAuth").
+
 That's  all, enjoy.  
 
 == Screenshots ==
@@ -67,6 +69,11 @@ That's  all, enjoy.
 3. Front-end playlist shortcode display
 
 == Changelog ==
+
+= 1.1.1 =
+
+* Plugin compatible with WordPress 4.3 (scheduled for release on August 18th, 2015);
+* Added Vimeo video albums import (not functional in version 1.1).
 
 = 1.1 =
 * Compatibility with Vimeo OAuth2;

@@ -4,13 +4,13 @@ Plugin Name: CodeFlavors Vimeo Video Post Lite
 Plugin URI: http://www.codeflavors.com/vimeo-video-post/
 Description: Import Vimeo videos directly into WordPress and display them as posts or embeded in existing posts and/or pages as single videos or playlists.
 Author: CodeFlavors
-Version: 1.1
+Version: 1.1.1
 Author URI: http://www.codeflavors.com
 */	
 
 define( 'CVM_PATH'		, plugin_dir_path(__FILE__) );
 define( 'CVM_URL'		, plugin_dir_url(__FILE__) );
-define( 'CVM_VERSION'	, '1.1');
+define( 'CVM_VERSION'	, '1.1.1');
 
 include_once CVM_PATH.'includes/functions.php';
 include_once CVM_PATH.'includes/shortcodes.php';

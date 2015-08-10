@@ -6,7 +6,7 @@ class CVM_Latest_Videos_Widget extends WP_Widget{
 	/**
 	 * Constructor
 	 */
-	function CVM_Latest_Videos_Widget(){
+	public function __construct(){
 		/* Widget settings. */
 		$widget_options = array( 
 			'classname' 	=> 'cvm-latest-videos', 
@@ -19,7 +19,7 @@ class CVM_Latest_Videos_Widget extends WP_Widget{
 		);
 
 		/* Create the widget. */
-		$this->WP_Widget( 
+		parent::__construct( 
 			'cvm-latest-videos-widget', 
 			__('Recent videos', 'cvm_video'), 
 			$widget_options, 
@@ -140,7 +140,7 @@ class CVM_Video_Categories_Widget extends WP_Widget{
 	/**
 	 * Constructor
 	 */
-	function CVM_Video_Categories_Widget(){
+	public function __construct(){
 		/* Widget settings. */
 		$widget_options = array( 
 			'classname' 	=> 'cvm-video-categories', 
@@ -153,7 +153,7 @@ class CVM_Video_Categories_Widget extends WP_Widget{
 		);
 
 		/* Create the widget. */
-		$this->WP_Widget( 
+		parent::__construct( 
 			'cvm-video-categories-widget', 
 			__('Video categories', 'cvm_video'), 
 			$widget_options, 

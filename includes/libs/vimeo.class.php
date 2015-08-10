@@ -319,6 +319,15 @@ class CVM_Vimeo extends CVM_Vimeo_Base{
 			'video' => array(
 				'action' => sprintf( 'videos/%s', $query ),
 				'params' => array()
+			),
+			'album' => array(
+				'action' => sprintf( 'albums/%s/videos', $query ),
+				'params' => array(
+					'page' 		=> $page,
+					'per_page' 	=> 20,
+					'sort'		=> $order_by,
+					'direction' => $order
+				)
 			)
 		);
 		
